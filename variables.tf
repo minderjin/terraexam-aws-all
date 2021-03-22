@@ -76,7 +76,6 @@ variable "was_cpu_credits" {}
 variable "was_volume_size" {}
 
 
-
 ####################
 # module ALB
 ####################
@@ -86,3 +85,27 @@ variable "http_tcp_listeners" {}
 variable "https_listeners" {}
 variable "target_groups" {}
 
+
+######################
+# module RDS (MySQL)
+######################
+
+variable "rds_engine" {}
+variable "rds_engine_version" {}
+variable "rds_instance_class" {}
+variable "rds_allocated_storage" {}
+variable "rds_storage_encrypted" {}
+# kms_key_id        = "arm:aws:kms:<region>:<account id>:key/<kms key id>"
+variable "rds_username" {}
+variable "rds_password" {}
+variable "rds_port" {}
+variable "rds_maintenance_window" {}
+variable "rds_backup_window" {}
+variable "rds_multi_az" {}
+variable "rds_backup_retention_period" {}
+variable "rds_enabled_cloudwatch_logs_exports" {}
+variable "rds_param_family" {}
+variable "rds_option_major_engine_version" {}
+variable "rds_deletion_protection" {}
+variable "rds_parameters" {}
+variable "rds_options" {}

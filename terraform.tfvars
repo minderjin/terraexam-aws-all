@@ -231,7 +231,7 @@ rds_parameters = [
   }
 ]
 
-options = []
+rds_options = []
 #   options = [
 #     {
 #       option_name = "MARIADB_AUDIT_PLUGIN"

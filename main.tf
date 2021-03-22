@@ -46,11 +46,13 @@ module "vpc" {
 }
 
 locals {
-  vpc_id           = module.vpc.vpc_id
-  vpc_cidr_block   = module.vpc.vpc_cidr_block
-  public_subnets   = module.vpc.public_subnets
-  private_subnets  = module.vpc.private_subnets
-  database_subnets = module.vpc.database_subnets
+  vpc_id                = module.vpc.vpc_id
+  vpc_cidr_block        = module.vpc.vpc_cidr_block
+  public_subnets        = module.vpc.public_subnets
+  private_subnets       = module.vpc.private_subnets
+  database_subnets      = module.vpc.database_subnets
+  database_subnet_group = module.vpc.database_subnet_group
+
 }
 
 ##########################
@@ -357,58 +359,58 @@ resource "aws_alb_target_group_attachment" "was" {
 # module RDS (MySQL)
 ######################
 
-# module "rds" {
-#   # 
-#   # public registry
-#   #   https://registry.terraform.io/modules/terraform-aws-modules/rds/aws/latest
-#   #
-#   source  = "terraform-aws-modules/rds/aws"
-#   # version = "2.34.0"
+module "rds" {
+  # 
+  # public registry
+  #   https://registry.terraform.io/modules/terraform-aws-modules/rds/aws/latest
+  #
+  source  = "terraform-aws-modules/rds/aws"
+  version = "2.20.0"
 
-#   identifier = "${var.name}-rds"
+  identifier = "${var.name}-rds"
 
-#   # All available versions: 
-#   #   http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html#MySQL.Concepts.VersionMgmt
-#   engine            = var.rds_engine
-#   engine_version    = var.rds_engine_version
-#   instance_class    = var.rds_instance_class
-#   allocated_storage = var.rds_allocated_storage
-#   storage_encrypted = var.rds_storage_encrypted
+  # All available versions: 
+  #   http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html#MySQL.Concepts.VersionMgmt
+  engine            = var.rds_engine
+  engine_version    = var.rds_engine_version
+  instance_class    = var.rds_instance_class
+  allocated_storage = var.rds_allocated_storage
+  storage_encrypted = var.rds_storage_encrypted
 
-#   # kms_key_id        = "arm:aws:kms:<region>:<account id>:key/<kms key id>"
-#   name                   = "${var.name}"
-#   username               = var.rds_username
-#   password               = var.rds_password
-#   port                   = var.rds_port
-#   vpc_security_group_ids = [local.db_security_group_id]
-#   maintenance_window     = var.rds_maintenance_window
-#   backup_window          = var.rds_backup_window
-#   multi_az               = var.rds_multi_az
+  # kms_key_id        = "arm:aws:kms:<region>:<account id>:key/<kms key id>"
+  name                   = "${var.name}"
+  username               = var.rds_username
+  password               = var.rds_password
+  port                   = var.rds_port
+  vpc_security_group_ids = [local.db_security_group_id]
+  maintenance_window     = var.rds_maintenance_window
+  backup_window          = var.rds_backup_window
+  multi_az               = var.rds_multi_az
 
-#   # disable backups to create DB faster
-#   backup_retention_period = var.rds_backup_retention_period
+  # disable backups to create DB faster
+  backup_retention_period = var.rds_backup_retention_period
 
-#   #   alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL)
-#   enabled_cloudwatch_logs_exports = var.rds_enabled_cloudwatch_logs_exports
+  #   alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL)
+  enabled_cloudwatch_logs_exports = var.rds_enabled_cloudwatch_logs_exports
 
-#   # DB subnet group
-#   #   subnet_ids = database_subnet_group
-#   db_subnet_group_name = local.database_subnet_group
+  # DB subnet group
+  #   subnet_ids = database_subnet_group
+  db_subnet_group_name = local.database_subnet_group
 
-#   # DB parameter group
-#   family = var.rds_param_family
+  # DB parameter group
+  family = var.rds_param_family
 
-#   # DB option group
-#   major_engine_version = var.rds_option_major_engine_version
+  # DB option group
+  major_engine_version = var.rds_option_major_engine_version
 
-#   # Snapshot name upon DB deletion
-#   final_snapshot_identifier = "${var.name}-rds-last-snapshop"
+  # Snapshot name upon DB deletion
+  final_snapshot_identifier = "${var.name}-rds-last-snapshop"
 
-#   # Database Deletion Protection
-#   deletion_protection = var.rds_deletion_protection
+  # Database Deletion Protection
+  deletion_protection = var.rds_deletion_protection
 
-#   parameters = var.rds_parameters
-#   options    = var.rds_options
+  parameters = var.rds_parameters
+  options    = var.rds_options
 
-#   tags = var.tags
-# }
+  tags = var.tags
+}
