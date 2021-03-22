@@ -75,3 +75,14 @@ variable "was_monitoring" {}
 variable "was_cpu_credits" {}
 variable "was_volume_size" {}
 
+
+
+####################
+# module ALB
+####################
+
+variable "load_balancer_type" {}
+variable "http_tcp_listeners" {}
+variable "https_listeners" {}
+variable "target_groups" {}
+

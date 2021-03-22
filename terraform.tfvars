@@ -110,3 +110,141 @@ was_monitoring                  = true
 was_cpu_credits                 = "unlimited"
 was_volume_size                 = 10
 
+
+####################
+# module ALB
+####################
+
+load_balancer_type = "application"
+http_tcp_listeners = [
+  {
+    port               = 80
+    protocol           = "HTTP"
+    target_group_index = 0
+  }
+]
+
+https_listeners = []
+# [
+#   {
+#     port               = 443
+#     protocol           = "HTTPS"
+#     certificate_arn    = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
+#     target_group_index = 0
+#   }
+# ]
+
+target_groups = [
+  {
+    name_prefix          = "http-"
+    backend_protocol     = "HTTP"
+    backend_port         = 80
+    target_type          = "instance"
+    deregistration_delay = 300
+    health_check = {
+      enabled             = true
+      interval            = 30
+      path                = "/"
+      port                = "traffic-port"
+      healthy_threshold   = 5
+      unhealthy_threshold = 2
+      timeout             = 5
+      protocol            = "HTTP"
+      matcher             = "200-399"
+    }
+    tags = {
+      InstanceTargetGroupTag = "was"
+    }
+  }
+]
+
+
+######################
+# module RDS (MySQL)
+######################
+
+rds_engine            = "mysql"
+rds_engine_version    = "5.7.31"
+rds_instance_class    = "db.t3.micro"
+rds_allocated_storage = 20
+rds_storage_encrypted = false
+
+# kms_key_id        = "arm:aws:kms:<region>:<account id>:key/<kms key id>"
+rds_username           = "admin"
+rds_password           = "YourPwdShouldBeLongAndSecure!"
+rds_port               = "3306"
+rds_maintenance_window = "Sat:19:00-Sat:21:00"
+rds_backup_window      = "16:00-19:00"
+rds_multi_az           = false
+
+# disable backups to create DB faster
+rds_backup_retention_period = 7
+
+#   alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL)
+rds_enabled_cloudwatch_logs_exports = ["audit", "general", "error", "slowquery"]
+
+# DB parameter group
+rds_param_family = "mysql5.7"
+
+# DB option group
+rds_option_major_engine_version = "5.7"
+
+# Database Deletion Protection
+rds_deletion_protection = false
+
+rds_parameters = [
+  {
+    name  = "character_set_client"
+    value = "utf8mb4"
+  },
+  {
+    name  = "character_set_connection"
+    value = "utf8mb4"
+  },
+  {
+    name  = "character_set_database"
+    value = "utf8mb4"
+  },
+  {
+    name  = "character_set_filesystem"
+    value = "utf8mb4"
+  },
+  {
+    name  = "character_set_results"
+    value = "utf8mb4"
+  },
+  {
+    name  = "character_set_server"
+    value = "utf8mb4"
+  },
+  {
+    name  = "collation_connection"
+    value = "utf8mb4_unicode_ci"
+  },
+  {
+    name  = "collation_server"
+    value = "utf8mb4_unicode_ci"
+  },
+  {
+    name  = "time_zone"
+    value = "Asia/Seoul"
+  }
+]
+
+options = []
+#   options = [
+#     {
+#       option_name = "MARIADB_AUDIT_PLUGIN"
+
+#       option_settings = [
+#         {
+#           name  = "SERVER_AUDIT_EVENTS"
+#           value = "CONNECT"
+#         },
+#         {
+#           name  = "SERVER_AUDIT_FILE_ROTATIONS"
+#           value = "37"
+#         },
+#       ]
+#     },
+#   ]

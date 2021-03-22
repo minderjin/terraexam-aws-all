@@ -78,3 +78,16 @@ output "was_ids" {
 output "was_private_ips" {
   value = module.was.private_ip
 }
+
+
+####################
+# module ALB
+####################
+
+output "alb_dns_name" {
+  value = module.alb.this_lb_dns_name
+}
+
+output "alb_arn" {
+  value = module.alb.this_lb_arn
+}

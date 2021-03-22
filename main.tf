@@ -169,11 +169,11 @@ module "custom_sg" {
 }
 
 locals {
-  bastion_sg_id = module.bastion_sg.this_security_group_id
-  alb_sg_id     = module.alb_sg.this_security_group_id
-  was_sg_id     = module.was_sg.this_security_group_id
-  db_sg_id      = module.db_sg.this_security_group_id
-  custom_sg_id  = module.custom_sg.this_security_group_id
+  bastion_security_group_id = module.bastion_sg.this_security_group_id
+  alb_security_group_id     = module.alb_sg.this_security_group_id
+  was_security_group_id     = module.was_sg.this_security_group_id
+  db_security_group_id      = module.db_sg.this_security_group_id
+  custom_security_group_id  = module.custom_sg.this_security_group_id
 }
 
 ##########################
@@ -247,7 +247,7 @@ module "bastion" {
 
   # subnet_id                   = local.public_subnets[0]
   subnet_ids             = local.public_subnets
-  vpc_security_group_ids = [local.bastion_sg_id]
+  vpc_security_group_ids = [local.bastion_security_group_id]
   user_data_base64       = base64encode(local.user_data)
 
   root_block_device = [
@@ -282,7 +282,7 @@ module "was" {
   cpu_credits                 = var.was_cpu_credits
 
   subnet_ids             = local.private_subnets
-  vpc_security_group_ids = [local.was_sg_id]
+  vpc_security_group_ids = [local.was_security_group_id]
   user_data_base64       = base64encode(local.was_user_data)
 
   root_block_device = [
@@ -305,3 +305,110 @@ module "was" {
 
   tags = var.tags
 }
+
+locals {
+  bastion_id        = module.bastion.id
+  bastion_public_ip = module.bastion.public_ip
+  was_ids           = module.was.id
+  was_private_ips   = module.was.private_ip
+}
+
+
+####################
+# module ALB
+####################
+
+module "alb" {
+  # 
+  # public registry
+  #   https://registry.terraform.io/modules/terraform-aws-modules/alb/aws/latest
+  #
+  source  = "terraform-aws-modules/alb/aws"
+  version = "5.12.0"
+
+  name               = "${var.name}-alb"
+  load_balancer_type = var.load_balancer_type
+
+  vpc_id          = local.vpc_id
+  subnets         = local.public_subnets
+  security_groups = [local.alb_security_group_id]
+
+  # access_logs = {
+  #   bucket = "my-alb-logs"
+  # }
+
+  http_tcp_listeners = var.http_tcp_listeners
+  https_listeners    = var.https_listeners
+  target_groups      = var.target_groups
+
+  tags = var.tags
+}
+
+resource "aws_alb_target_group_attachment" "was" {
+  count = length(local.was_ids)
+
+  target_group_arn = module.alb.target_group_arns[0]
+  target_id        = local.was_ids[count.index]
+  port             = 80
+}
+
+
+######################
+# module RDS (MySQL)
+######################
+
+# module "rds" {
+#   # 
+#   # public registry
+#   #   https://registry.terraform.io/modules/terraform-aws-modules/rds/aws/latest
+#   #
+#   source  = "terraform-aws-modules/rds/aws"
+#   # version = "2.34.0"
+
+#   identifier = "${var.name}-rds"
+
+#   # All available versions: 
+#   #   http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html#MySQL.Concepts.VersionMgmt
+#   engine            = var.rds_engine
+#   engine_version    = var.rds_engine_version
+#   instance_class    = var.rds_instance_class
+#   allocated_storage = var.rds_allocated_storage
+#   storage_encrypted = var.rds_storage_encrypted
+
+#   # kms_key_id        = "arm:aws:kms:<region>:<account id>:key/<kms key id>"
+#   name                   = "${var.name}"
+#   username               = var.rds_username
+#   password               = var.rds_password
+#   port                   = var.rds_port
+#   vpc_security_group_ids = [local.db_security_group_id]
+#   maintenance_window     = var.rds_maintenance_window
+#   backup_window          = var.rds_backup_window
+#   multi_az               = var.rds_multi_az
+
+#   # disable backups to create DB faster
+#   backup_retention_period = var.rds_backup_retention_period
+
+#   #   alert, audit, error, general, listener, slowquery, trace, postgresql (PostgreSQL), upgrade (PostgreSQL)
+#   enabled_cloudwatch_logs_exports = var.rds_enabled_cloudwatch_logs_exports
+
+#   # DB subnet group
+#   #   subnet_ids = database_subnet_group
+#   db_subnet_group_name = local.database_subnet_group
+
+#   # DB parameter group
+#   family = var.rds_param_family
+
+#   # DB option group
+#   major_engine_version = var.rds_option_major_engine_version
+
+#   # Snapshot name upon DB deletion
+#   final_snapshot_identifier = "${var.name}-rds-last-snapshop"
+
+#   # Database Deletion Protection
+#   deletion_protection = var.rds_deletion_protection
+
+#   parameters = var.rds_parameters
+#   options    = var.rds_options
+
+#   tags = var.tags
+# }
