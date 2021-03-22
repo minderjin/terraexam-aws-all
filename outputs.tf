@@ -91,3 +91,12 @@ output "alb_dns_name" {
 output "alb_arn" {
   value = module.alb.this_lb_arn
 }
+
+
+####################
+# module RDS
+####################
+
+output "db_instance_endpoint" {
+  value = module.rds.this_db_instance_endpoint
+}
