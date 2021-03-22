@@ -33,3 +33,48 @@ output "database_subnets_cidr_blocks" {
 output "database_subnet_group" {
   value = module.vpc.database_subnet_group
 }
+
+####################
+# module SG
+####################
+
+output "bastion_sg_id" {
+  value = module.bastion_sg.this_security_group_id
+}
+
+output "alb_sg_id" {
+  value = module.alb_sg.this_security_group_id
+}
+
+output "web_sg_id" {
+  value = module.was_sg.this_security_group_id
+}
+
+output "db_sg_id" {
+  value = module.db_sg.this_security_group_id
+}
+
+output "custom_sg_id" {
+  value = module.custom_sg.this_security_group_id
+}
+
+
+####################
+# module EC2
+####################
+
+output "bastion_id" {
+  value = module.bastion.id
+}
+
+output "bastion_public_ip" {
+  value = module.bastion.public_ip
+}
+
+output "was_ids" {
+  value = module.was.id
+}
+
+output "was_private_ips" {
+  value = module.was.private_ip
+}

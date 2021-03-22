@@ -22,13 +22,26 @@
 #     AWS_SECRET_ACCESS_KEY
 #
 
+####################
+# Common
+####################
 
-region = "us-west-2"
+region = "ap-northeast-2"
+name   = "terraexam"
 
-name = "example"
+tags = {
+  Terraform   = "true"
+  Environment = "dev"
+}
+
+
+####################
+# module VPC
+####################
+
 cidr = "10.0.0.0/16"
 
-azs = ["us-west-2a", "us-west-2c"]
+azs = ["ap-northeast-2a", "ap-northeast-2c"]
 
 public_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
 public_subnet_tags = {
@@ -54,7 +67,46 @@ create_database_nat_gateway_route      = false
 create_database_internet_gateway_route = false
 create_database_subnet_group           = true
 
-tags = {
-  Terraform   = "true"
-  Environment = "dev"
-}
+
+##########################
+# module Security Group
+##########################
+
+## Bastion SG
+bastion_egress_rules        = ["all-all"]
+bastion_ingress_cidr_blocks = ["211.60.50.190/32"]
+bastion_ingress_rules       = ["ssh-tcp"]
+
+## ALB SG
+alb_egress_rules        = ["all-all"]
+alb_ingress_cidr_blocks = ["0.0.0.0/0"]
+alb_ingress_rules       = ["http-80-tcp", "https-443-tcp"]
+
+## DB SG
+db_egress_rules        = ["all-all"]
+db_ingress_cidr_blocks = [] // []일경우, vpc_cidr_block
+db_ingress_rules       = ["mysql-tcp"]
+
+
+##########################
+# module EC2
+##########################
+
+## Bastion
+bastion_instance_type               = "t3.micro"
+bastion_key_name                    = "ssh-key"
+bastion_termination_protection      = false
+bastion_associate_public_ip_address = true
+bastion_monitoring                  = false
+bastion_cpu_credits                 = "unlimited"
+bastion_volume_size                 = 8
+
+## WAS
+was_instance_type               = "t3.micro"
+was_key_name                    = "ssh-key"
+was_termination_protection      = false
+was_associate_public_ip_address = false
+was_monitoring                  = true
+was_cpu_credits                 = "unlimited"
+was_volume_size                 = 10
+
