@@ -51,8 +51,7 @@ locals {
   public_subnets        = module.vpc.public_subnets
   private_subnets       = module.vpc.private_subnets
   database_subnets      = module.vpc.database_subnets
-  database_subnet_group = module.vpc.database_subnet_group
-
+  # database_subnet_group = module.vpc.database_subnet_group
 }
 
 ##########################
@@ -371,11 +370,12 @@ module "rds" {
 
   # All available versions: 
   #   http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html#MySQL.Concepts.VersionMgmt
-  engine            = var.rds_engine
-  engine_version    = var.rds_engine_version
-  instance_class    = var.rds_instance_class
-  allocated_storage = var.rds_allocated_storage
-  storage_encrypted = var.rds_storage_encrypted
+  engine                = var.rds_engine
+  engine_version        = var.rds_engine_version
+  instance_class        = var.rds_instance_class
+  allocated_storage     = var.rds_allocated_storage
+  storage_encrypted     = var.rds_storage_encrypted
+  max_allocated_storage = var.rds_max_allocated_storage
 
   # kms_key_id        = "arm:aws:kms:<region>:<account id>:key/<kms key id>"
   name                   = var.rds_db_name
@@ -394,10 +394,10 @@ module "rds" {
   enabled_cloudwatch_logs_exports = var.rds_enabled_cloudwatch_logs_exports
 
   # DB subnet group
-  #   subnet_ids = database_subnet_group
-  db_subnet_group_name   = local.database_subnet_group
-  create_db_subnet_group = false
-
+  # db_subnet_group_name   = local.database_subnet_group
+  create_db_subnet_group = true
+  subnet_ids = local.database_subnets
+  
   # DB parameter group
   family = var.rds_param_family
 
@@ -406,35 +406,35 @@ module "rds" {
 
   # Snapshot name upon DB deletion
   # final_snapshot_identifier = join("", [var.name, "-last-", formatdate("YYYYMMMDDhhmmss", timestamp())])
-  skip_final_snapshot = var.skip_final_snapshot
+  skip_final_snapshot = var.rds_skip_final_snapshot
 
   # Database Deletion Protection
   deletion_protection = var.rds_deletion_protection
 
   parameters = var.rds_parameters
   options    = var.rds_options
-  
+
   ## Enhanced monitoring ##
   ##
   # The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. 
   # To disable collecting Enhanced Monitoring metrics, specify 0. 
   # The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60.
-  monitoring_interval = var.monitoring_interval
-  
+  monitoring_interval = var.rds_monitoring_interval
+
   # Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.
-  create_monitoring_role = var.create_monitoring_role
-  
+  create_monitoring_role = var.rds_create_monitoring_role
+
   # Name of the IAM role which will be created when create_monitoring_role is enabled.
-  monitoring_role_name = var.monitoring_role_name
+  monitoring_role_name = var.rds_monitoring_role_name
 
   ## Performance Insights ##
   ##
   # Specifies whether Performance Insights are enabled
-  performance_insights_enabled = var.performance_insights_enabled
-  
+  performance_insights_enabled = var.rds_performance_insights_enabled
+
   # The amount of time in days to retain Performance Insights data. Either 7 (7 days) or 731 (2 years).
-  performance_insights_retention_period = var.performance_insights_retention_period
-  
+  performance_insights_retention_period = var.rds_performance_insights_retention_period
+
   # The ARN for the KMS key to encrypt Performance Insights data.
   # performance_insights_kms_key_id = ''
 

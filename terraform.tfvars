@@ -65,7 +65,7 @@ one_nat_gateway_per_az = false
 create_database_subnet_route_table     = true
 create_database_nat_gateway_route      = false
 create_database_internet_gateway_route = false
-create_database_subnet_group           = true
+create_database_subnet_group           = false
 
 
 ##########################
@@ -163,11 +163,12 @@ target_groups = [
 # module RDS (MySQL)
 ######################
 
-rds_engine            = "mysql"
-rds_engine_version    = "5.7.31"
-rds_instance_class    = "db.t3.medium"  # Required >t3.medium for Performance Insights
-rds_allocated_storage = 20
-rds_storage_encrypted = false
+rds_engine                = "mysql"
+rds_engine_version        = "5.7.31"
+rds_instance_class        = "db.t3.medium" # Required >t3.medium for Performance Insights
+rds_allocated_storage     = 20
+rds_storage_encrypted     = false
+rds_max_allocated_storage = 100
 
 # kms_key_id        = "arm:aws:kms:<region>:<account id>:key/<kms key id>"
 rds_db_name            = "mydb"
@@ -191,7 +192,7 @@ rds_param_family = "mysql5.7"
 rds_option_major_engine_version = "5.7"
 
 # Final snapshot
-skip_final_snapshot = true
+rds_skip_final_snapshot = true
 
 # Database Deletion Protection
 rds_deletion_protection = false
@@ -254,17 +255,17 @@ rds_options = []
 #   ]
 
 # The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60.
-monitoring_interval = 60
+rds_monitoring_interval = 60
 
 # Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.
-create_monitoring_role = true
+rds_create_monitoring_role = true
 
 # Name of the IAM role which will be created when create_monitoring_role is enabled.
-monitoring_role_name = "rds-monitoring-role0"
+rds_monitoring_role_name = "rds-monitoring-role0"
 
 
 # Specifies whether Performance Insights are enabled
-performance_insights_enabled = true
+rds_performance_insights_enabled = true
 
 # The amount of time in days to retain Performance Insights data. Either 7 (7 days) or 731 (2 years).
-performance_insights_retention_period = 7
+rds_performance_insights_retention_period = 7
