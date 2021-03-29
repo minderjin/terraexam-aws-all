@@ -96,6 +96,7 @@ variable "rds_instance_class" {}
 variable "rds_allocated_storage" {}
 variable "rds_storage_encrypted" {}
 # kms_key_id        = "arm:aws:kms:<region>:<account id>:key/<kms key id>"
+variable "rds_db_name" {}
 variable "rds_username" {}
 variable "rds_password" {}
 variable "rds_port" {}

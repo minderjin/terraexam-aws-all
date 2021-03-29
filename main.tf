@@ -109,11 +109,11 @@ module "was_sg" {
   computed_ingress_with_source_security_group_id = [
     {
       rule                     = "http-80-tcp"
-      source_security_group_id = "${module.alb_sg.this_security_group_id}"
+      source_security_group_id = module.alb_sg.this_security_group_id
     },
     {
       rule                     = "ssh-tcp"
-      source_security_group_id = "${module.bastion_sg.this_security_group_id}"
+      source_security_group_id = module.bastion_sg.this_security_group_id
     },
   ]
   # Number of computed ingress rules to create where 'source_security_group_id' is used
@@ -365,7 +365,7 @@ module "rds" {
   #   https://registry.terraform.io/modules/terraform-aws-modules/rds/aws/latest
   #
   source  = "terraform-aws-modules/rds/aws"
-  version = "2.20.0"
+  version = "2.34.0"
 
   identifier = "${var.name}-rds"
 
@@ -378,7 +378,7 @@ module "rds" {
   storage_encrypted = var.rds_storage_encrypted
 
   # kms_key_id        = "arm:aws:kms:<region>:<account id>:key/<kms key id>"
-  name                   = "${var.name}"
+  name                   = var.rds_db_name
   username               = var.rds_username
   password               = var.rds_password
   port                   = var.rds_port
@@ -395,7 +395,8 @@ module "rds" {
 
   # DB subnet group
   #   subnet_ids = database_subnet_group
-  db_subnet_group_name = local.database_subnet_group
+  db_subnet_group_name   = local.database_subnet_group
+  create_db_subnet_group = false
 
   # DB parameter group
   family = var.rds_param_family
@@ -404,13 +405,38 @@ module "rds" {
   major_engine_version = var.rds_option_major_engine_version
 
   # Snapshot name upon DB deletion
-  final_snapshot_identifier = "${var.name}-rds-last-snapshop"
+  # final_snapshot_identifier = join("", [var.name, "-last-", formatdate("YYYYMMMDDhhmmss", timestamp())])
+  skip_final_snapshot = true
 
   # Database Deletion Protection
   deletion_protection = var.rds_deletion_protection
 
   parameters = var.rds_parameters
   options    = var.rds_options
+  
+  ## Enhanced monitoring ##
+  ##
+  # The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. 
+  # To disable collecting Enhanced Monitoring metrics, specify 0. 
+  # The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60.
+  # monitoring_interval = 60
+  
+  # Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.
+  # create_monitoring_role = true
+  
+  # Name of the IAM role which will be created when create_monitoring_role is enabled.
+  # monitoring_role_name = "rds-monitoring-role"
+
+  ## Performance Insights ##
+  ##
+  # Specifies whether Performance Insights are enabled
+  # performance_insights_enabled = true
+  
+  # The amount of time in days to retain Performance Insights data. Either 7 (7 days) or 731 (2 years).
+  # performance_insights_retention_period = 7
+  
+  # The ARN for the KMS key to encrypt Performance Insights data.
+  # performance_insights_kms_key_id = '9739ddb0-2f56-4956-ae1d-d61f054e2a72'
 
   tags = var.tags
 }
