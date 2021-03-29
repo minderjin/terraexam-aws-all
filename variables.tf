@@ -107,7 +107,12 @@ variable "rds_backup_retention_period" {}
 variable "rds_enabled_cloudwatch_logs_exports" {}
 variable "rds_param_family" {}
 variable "rds_option_major_engine_version" {}
+variable "skip_final_snapshot" {}
 variable "rds_deletion_protection" {}
 variable "rds_parameters" {}
 variable "rds_options" {}
-
+variable "monitoring_interval" {}
+variable "create_monitoring_role" {}
+variable "monitoring_role_name" {}
+variable "performance_insights_enabled" {}
+variable "performance_insights_retention_period" {}

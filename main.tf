@@ -406,7 +406,7 @@ module "rds" {
 
   # Snapshot name upon DB deletion
   # final_snapshot_identifier = join("", [var.name, "-last-", formatdate("YYYYMMMDDhhmmss", timestamp())])
-  skip_final_snapshot = true
+  skip_final_snapshot = var.skip_final_snapshot
 
   # Database Deletion Protection
   deletion_protection = var.rds_deletion_protection
@@ -419,24 +419,24 @@ module "rds" {
   # The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. 
   # To disable collecting Enhanced Monitoring metrics, specify 0. 
   # The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60.
-  # monitoring_interval = 60
+  monitoring_interval = var.monitoring_interval
   
   # Create IAM role with a defined name that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.
-  # create_monitoring_role = true
+  create_monitoring_role = var.create_monitoring_role
   
   # Name of the IAM role which will be created when create_monitoring_role is enabled.
-  # monitoring_role_name = "rds-monitoring-role"
+  monitoring_role_name = var.monitoring_role_name
 
   ## Performance Insights ##
   ##
   # Specifies whether Performance Insights are enabled
-  # performance_insights_enabled = true
+  performance_insights_enabled = var.performance_insights_enabled
   
   # The amount of time in days to retain Performance Insights data. Either 7 (7 days) or 731 (2 years).
-  # performance_insights_retention_period = 7
+  performance_insights_retention_period = var.performance_insights_retention_period
   
   # The ARN for the KMS key to encrypt Performance Insights data.
-  # performance_insights_kms_key_id = '9739ddb0-2f56-4956-ae1d-d61f054e2a72'
+  # performance_insights_kms_key_id = ''
 
   tags = var.tags
 }
